@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:i_market/cart/cart_screen.dart';
 import 'package:i_market/widgets/app_drawer.dart';
 import 'package:i_market/widgets/categories.dart';
 import 'package:i_market/widgets/home_header.dart';
 import 'package:i_market/widgets/market_section.dart';
-
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -15,10 +15,10 @@ class HomeScreen extends StatelessWidget {
         title: const Text('iMarket'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.shopping_cart),
+            icon: Icon(Icons.shopping_cart),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => Text('CartPage()')),
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => CartScreen() )
               );
             },
           ),

@@ -67,7 +67,7 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Categories'),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Text('FoodCategoriesPage()')));
+                  builder: (context) => const Text('FoodCategoriesPage()')));
             },
           ),
           ListTile(
