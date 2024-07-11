@@ -1,24 +1,58 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:i_market/home/Home.dart';
+import 'package:i_market/services/auth_service.dart'; // Import AuthService
+
 class LoginForm extends StatelessWidget {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final AuthService _authService = AuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login(BuildContext context) async {
     try {
-      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+      User? user = await _authService.signInWithEmailPassword(
+        _emailController.text,
+        _passwordController.text,
       );
-      // Navigate to home screen or show a success message
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
-    } on FirebaseAuthException catch (e) {
+      if (user != null) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
+      }
+    } catch (e) {
+      _showErrorDialog(context, 'Failed with error code: ${e.toString()}');
+    }
+  }
 
-      showDialog(
+  Future<void> _loginWithGoogle(BuildContext context) async {
+    try {
+      User? user = await _authService.signInWithGoogle(); // Add signInWithGoogle in AuthService
+      if (user != null) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
+      }
+    } catch (e) {
+      _showErrorDialog(context, 'Error during Google sign-in: ${e.toString()}');
+    }
+  }
+
+  Future<void> _resetPassword(BuildContext context) async {
+    final String email = _emailController.text;
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter your email address.')),
+      );
+      return;
+    }
+    try {
+      await _authService.resetPassword(email); // Add resetPassword in AuthService
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Password reset email sent!')),
+      );
+    } catch (e) {
+      _showErrorDialog(context, 'Error sending password reset email: ${e.toString()}');
+    }
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -29,7 +63,7 @@ class LoginForm extends StatelessWidget {
             ),
           ),
           content: Text(
-            "Failed with error code: ${e.code}\n${e.message}",
+            message,
             style: TextStyle(color: Colors.black, fontSize: 16),
           ),
           actions: [
@@ -50,29 +84,6 @@ class LoginForm extends StatelessWidget {
         );
       },
     );
-      print('Failed with error code: ${e.code}');
-      print(e.message);
-    }
-  }
-
-  Future<void> _loginWithGoogle(BuildContext context) async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        return; // User canceled the sign-in
-      }
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
-      // Navigate to home screen or show a success message
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
-    } catch (e) {
-      // Handle error
-      print(e);
-    }
   }
 
   @override
@@ -101,9 +112,7 @@ class LoginForm extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
-            onPressed: () {
-              // Implement forget password functionality
-            },
+            onPressed: () => _resetPassword(context),
             child: const Text(
               'Forgot Password?',
               style: TextStyle(color: Colors.pink),
@@ -115,7 +124,8 @@ class LoginForm extends StatelessWidget {
           onPressed: () => _login(context),
           child: const Text('Login'),
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white, backgroundColor: Colors.pink,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.pink,
             padding: const EdgeInsets.symmetric(vertical: 10),
           ),
         ),
@@ -128,7 +138,8 @@ class LoginForm extends StatelessWidget {
           ),
           label: const Text('Login with Google'),
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.black, backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            backgroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 10),
             side: const BorderSide(color: Colors.grey),
           ),

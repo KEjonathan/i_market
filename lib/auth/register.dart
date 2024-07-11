@@ -1,49 +1,76 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:i_market/home/Home.dart';
+import 'package:i_market/services/auth_service.dart'; // Import AuthService
+
 class RegisterForm extends StatelessWidget {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final AuthService _authService = AuthService(); // Use AuthService
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _signUp(BuildContext context) async {
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+      User? user = await _authService.registerWithEmailPassword(
+        _emailController.text,
+        _passwordController.text,
       );
-      await userCredential.user?.updateProfile(displayName: _nameController.text);
-      // Navigate to home screen or show a success message
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
-    } on FirebaseAuthException catch (e) {
-      // Handle error
-      print('Failed with error code: ${e.code}');
-      print(e.message);
+      if (user != null) {
+        await user.updateProfile(displayName: _nameController.text);
+        // Navigate to home screen or show a success message
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
+      }
+    } catch (e) {
+      _showErrorDialog(context, 'Failed with error code: ${e.toString()}');
     }
   }
 
   Future<void> _signUpWithGoogle(BuildContext context) async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        return; // User canceled the sign-in
+      User? user = await _authService.signInWithGoogle();
+      if (user != null) {
+        // User display name is already updated by signInWithGoogle
+        // Navigate to home screen or show a success message
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
       }
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
-      await userCredential.user?.updateProfile(displayName: googleUser.displayName);
-      // Navigate to home screen or show a success message
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
     } catch (e) {
-      // Handle error
-      print(e);
+      _showErrorDialog(context, 'Error during Google sign-in: ${e.toString()}');
     }
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(
+            child: Text(
+              "iMarket Notice",
+              style: TextStyle(color: Colors.pink, fontSize: 20),
+            ),
+          ),
+          content: Text(
+            message,
+            style: TextStyle(color: Colors.black, fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                "OK",
+                style: TextStyle(color: Colors.blue),
+              ),
+            ),
+          ],
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -56,7 +83,7 @@ class RegisterForm extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Full Name',
             border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.person_2_outlined)
+            prefixIcon: Icon(Icons.person_2_outlined),
           ),
         ),
         const SizedBox(height: 10),
@@ -65,7 +92,7 @@ class RegisterForm extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Email Address',
             border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.email_outlined)
+            prefixIcon: Icon(Icons.email_outlined),
           ),
         ),
         const SizedBox(height: 10),
@@ -75,7 +102,7 @@ class RegisterForm extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Password',
             border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.lock)
+            prefixIcon: Icon(Icons.lock),
           ),
         ),
         const SizedBox(height: 20),
@@ -83,7 +110,8 @@ class RegisterForm extends StatelessWidget {
           onPressed: () => _signUp(context),
           child: const Text('Sign Up'),
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white, backgroundColor: Colors.pink,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.pink,
             padding: const EdgeInsets.symmetric(vertical: 10),
           ),
         ),
@@ -96,7 +124,8 @@ class RegisterForm extends StatelessWidget {
           ),
           label: const Text('Sign up with Google'),
           style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.black, backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            backgroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 10),
             side: const BorderSide(color: Colors.grey),
           ),
