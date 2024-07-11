@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"my-imarket","appId":"1:1046728464791:android:86df9b8ea8853a960fccd2","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"my-imarket","configurations":{"android":"1:1046728464791:android:86df9b8ea8853a960fccd2","ios":"1:1046728464791:ios:05287fc03fed7ca00fccd2"}}}}}}

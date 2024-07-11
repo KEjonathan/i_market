@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1046728464791",
+    "project_id": "my-imarket",
+    "storage_bucket": "my-imarket.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046728464791:android:86df9b8ea8853a960fccd2",
+        "android_client_info": {
+          "package_name": "com.iMarket.i_market"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1046728464791-5r74e57ht96b7mpinf3f2341c4mf70tg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzpoyUo3LF62ABgFpVywc1mQIqm5-hbTk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1046728464791-5r74e57ht96b7mpinf3f2341c4mf70tg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1046728464791-8gv5ah2oo5g1hf4oemagar6piv98abaa.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.iMarket.iMarket"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
