@@ -1,6 +1,7 @@
 // screens/cart_screen.dart
 import 'package:flutter/material.dart';
 import 'package:i_market/cart/c_model.dart';
+import 'package:i_market/widgets/vendors.dart';
 import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 
@@ -40,7 +41,7 @@ class CartScreen extends StatelessWidget {
                   TextButton(
                     child: Text('CHECKOUT'),
                     onPressed: () {
-                      // Implement checkout functionality
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>VendorsScreen()));
                     },
                   )
                 ],
